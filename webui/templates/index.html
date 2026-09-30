@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}Dashboard · vinted-scraper{% endblock %}
+{% block content %}
+<h1>Dashboard</h1>
+
+<div class="cards">
+  <div class="card"><div class="card-value">{{ stats.total_queries }}</div><div class="card-label">Searches</div></div>
+  <div class="card"><div class="card-value">{{ stats.total_items }}</div><div class="card-label">Items found</div></div>
+  <div class="card"><div class="card-value">{{ stats.items_per_day }}</div><div class="card-label">Items / day</div></div>
+  <div class="card"><div class="card-value">{{ refresh }}s</div><div class="card-label">Refresh interval</div></div>
+</div>
+
+<section class="panel">
+  <h2>Notification channels</h2>
+  {% if notifiers %}
+    <p>Active: {% for n in notifiers %}<span class="pill on">{{ n }}</span>{% endfor %}</p>
+  {% else %}
+    <p class="muted">No channels enabled yet. Set one up in <a href="{{ url_for('config_page') }}">Config</a>.</p>
+  {% endif %}
+  {% if rss_enabled %}<p>RSS feed: <a href="{{ url_for('feed') }}">/feed.xml</a></p>{% endif %}
+</section>
+
+<section class="panel">
+  <h2>Last item found</h2>
+  {% if stats.last_item %}
+    <p>
+      <a href="{{ stats.last_item.item_url }}" target="_blank" rel="noopener">{{ stats.last_item.title }}</a>
+      — {{ stats.last_item.price }} {{ stats.last_item.currency }}
+      <span class="muted">({{ stats.last_item.found_at | dt }})</span>
+    </p>
+  {% else %}
+    <p class="muted">Nothing found yet.</p>
+  {% endif %}
+</section>
+{% endblock %}

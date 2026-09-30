@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block title %}Config · vinted-scraper{% endblock %}
+{% block content %}
+<h1>Configuration</h1>
+
+<form method="post">
+  <section class="panel">
+    <h2>Scraping</h2>
+    <label>Items per query <input type="number" name="items_per_query" value="{{ params.items_per_query }}" min="1" max="96"></label>
+    <label>Refresh delay (seconds) <input type="number" name="query_refresh_delay" value="{{ params.query_refresh_delay }}" min="10"></label>
+    <label>Banwords (separate with <code>|||</code>) <input type="text" name="banwords" value="{{ params.banwords }}"></label>
+  </section>
+
+  <section class="panel">
+    <h2>Telegram</h2>
+    <label class="check"><input type="checkbox" name="telegram_enabled" {% if params.telegram_enabled == 'True' %}checked{% endif %}> Enabled</label>
+    <label>Bot token <input type="text" name="telegram_token" value="{{ params.telegram_token }}" placeholder="123456:ABC-..."></label>
+    <label>Chat ID <input type="text" name="telegram_chat_id" value="{{ params.telegram_chat_id }}" placeholder="e.g. 12345678"></label>
+  </section>
+
+  <section class="panel">
+    <h2>ntfy</h2>
+    <label class="check"><input type="checkbox" name="ntfy_enabled" {% if params.ntfy_enabled == 'True' %}checked{% endif %}> Enabled</label>
+    <label>Server <input type="text" name="ntfy_server" value="{{ params.ntfy_server }}"></label>
+    <label>Topic <input type="text" name="ntfy_topic" value="{{ params.ntfy_topic }}" placeholder="your-secret-topic"></label>
+    <label>Token (optional) <input type="text" name="ntfy_token" value="{{ params.ntfy_token }}"></label>
+    <label>Priority
+      <select name="ntfy_priority">
+        {% for p in ['min','low','default','high','urgent'] %}
+        <option value="{{ p }}" {% if params.ntfy_priority == p %}selected{% endif %}>{{ p }}</option>
+        {% endfor %}
+      </select>
+    </label>
+  </section>
+
+  <section class="panel">
+    <h2>RSS</h2>
+    <label class="check"><input type="checkbox" name="rss_enabled" {% if params.rss_enabled == 'True' %}checked{% endif %}> Enabled (served at /feed.xml)</label>
+    <label>Max items <input type="number" name="rss_max_items" value="{{ params.rss_max_items }}" min="1" max="500"></label>
+  </section>
+
+  <section class="panel">
+    <h2>Proxies</h2>
+    <label>Proxy list (<code>;</code>-separated) <input type="text" name="proxy_list" value="{{ params.proxy_list }}"></label>
+    <label>Proxy list URL <input type="text" name="proxy_list_link" value="{{ params.proxy_list_link }}"></label>
+    <label class="check"><input type="checkbox" name="check_proxies" {% if params.check_proxies == 'True' %}checked{% endif %}> Validate proxies before use</label>
+  </section>
+
+  <div class="actions">
+    <button type="submit">Save configuration</button>
+  </div>
+</form>
+
+<section class="panel">
+  <h2>Seller country allowlist</h2>
+  <p class="muted">Empty = accept sellers from all countries. Use 2-letter ISO codes (NL, BE, DE…).</p>
+  <p>
+    {% for c in allowlist %}
+      <span class="pill on">{{ c }}
+        <form method="post" action="{{ url_for('allowlist') }}" style="display:inline">
+          <input type="hidden" name="country" value="{{ c }}"><input type="hidden" name="action" value="remove">
+          <button class="linkbtn" type="submit">✕</button>
+        </form>
+      </span>
+    {% else %}<span class="muted">(all countries allowed)</span>{% endfor %}
+  </p>
+  <form method="post" action="{{ url_for('allowlist') }}" class="form-row">
+    <input type="text" name="country" maxlength="2" placeholder="NL" style="max-width:80px">
+    <input type="hidden" name="action" value="add">
+    <button type="submit">Add country</button>
+  </form>
+</section>
+
+<section class="panel">
+  <h2>Test</h2>
+  <form method="post" action="{{ url_for('test_notification') }}">
+    <button type="submit">Send test notification</button>
+  </form>
+</section>
+{% endblock %}

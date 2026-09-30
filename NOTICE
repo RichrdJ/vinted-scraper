@@ -1,0 +1,19 @@
+vinted-scraper
+Copyright (C) 2026 the vinted-scraper authors
+
+This program is free software: you can redistribute it and/or modify it under the
+terms of the GNU Affero General Public License as published by the Free Software
+Foundation, either version 3 of the License, or (at your option) any later version.
+
+This project is derived from and inspired by:
+
+    Vinted-Notifications
+    https://github.com/Fuyucch1/Vinted-Notifications
+    Copyright (C) Fuyucch1, licensed under AGPL-3.0
+
+The query-normalization logic, proxy handling, feature set and overall architecture
+were adapted from that project. It has been substantially rewritten: listings are
+parsed from catalog HTML via curl_cffi (instead of the now bot-protected JSON API),
+novelty is id-based, the runtime is a single threaded process (instead of the original
+multiprocessing design), and it adds a new Flask dashboard, ntfy support and silent
+first-scrape seeding.

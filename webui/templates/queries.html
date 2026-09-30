@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Searches · vinted-scraper{% endblock %}
+{% block content %}
+<h1>Searches</h1>
+
+<section class="panel">
+  <h2>Add a search</h2>
+  <form method="post" class="form-row">
+    <input type="url" name="url" placeholder="https://www.vinted.nl/catalog?search_text=..." required>
+    <input type="text" name="name" placeholder="Optional name">
+    <button type="submit">Add</button>
+  </form>
+  <p class="muted">Paste any Vinted catalog/search URL from your browser. It's normalized to newest-first automatically.</p>
+</section>
+
+<section class="panel">
+  <h2>Monitored searches ({{ queries|length }})</h2>
+  {% if queries %}
+  <table>
+    <thead><tr><th>#</th><th>Name</th><th>URL</th><th>Added</th><th></th></tr></thead>
+    <tbody>
+      {% for q in queries %}
+      <tr>
+        <td>{{ loop.index }}</td>
+        <td>{{ q.name or "—" }}</td>
+        <td class="url"><a href="{{ q.url }}" target="_blank" rel="noopener">{{ q.url }}</a></td>
+        <td class="muted">{{ q.created_at | dt }}</td>
+        <td>
+          <form method="post" action="{{ url_for('delete_query', query_id=q.id) }}" onsubmit="return confirm('Remove this search?');">
+            <button class="danger" type="submit">Remove</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p class="muted">No searches yet.</p>
+  {% endif %}
+</section>
+{% endblock %}

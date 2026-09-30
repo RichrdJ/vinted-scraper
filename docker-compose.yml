@@ -1,0 +1,13 @@
+services:
+  vinted-scraper:
+    build: .
+    # Or use a prebuilt image once published:
+    # image: ghcr.io/richrdj/vinted-scraper:latest
+    container_name: vinted-scraper
+    restart: unless-stopped
+    ports:
+      - "8000:8000"        # web dashboard
+    volumes:
+      - ./data:/app/data   # SQLite DB + logs
+    env_file:
+      - .env

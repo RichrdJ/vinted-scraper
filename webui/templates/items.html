@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Items · vinted-scraper{% endblock %}
+{% block content %}
+<h1>Found items</h1>
+{% if items %}
+<div class="grid">
+  {% for it in items %}
+  <a class="item" href="{{ it.item_url }}" target="_blank" rel="noopener">
+    {% if it.photo_url %}<img src="{{ it.photo_url }}" alt="" loading="lazy">{% else %}<div class="noimg">no image</div>{% endif %}
+    <div class="item-body">
+      <div class="item-title">{{ it.title }}</div>
+      <div class="item-price">{{ it.price }} {{ it.currency }}</div>
+      <div class="item-meta muted">
+        {% if it.brand %}{{ it.brand }}{% endif %}
+        {% if it.size %} · {{ it.size }}{% endif %}
+      </div>
+      <div class="item-meta muted">{{ it.query_name or it.query_url }} · {{ it.found_at | dt }}</div>
+    </div>
+  </a>
+  {% endfor %}
+</div>
+{% else %}
+<p class="muted">No items found yet.</p>
+{% endif %}
+{% endblock %}

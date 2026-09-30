@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+{% block title %}Logs · vinted-scraper{% endblock %}
+{% block content %}
+<h1>Logs</h1>
+<p class="muted">Last 400 lines. <a href="{{ url_for('logs') }}">Refresh</a></p>
+<pre class="logs">{{ content }}</pre>
+{% endblock %}
