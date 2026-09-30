@@ -80,7 +80,7 @@ services:
     pull_policy: always
     container_name: vinted-monitor
     ports:
-      - "8000:8000"
+      - "8344:8344"
     volumes:
       - vinted_data:/app/data
     restart: unless-stopped
@@ -99,7 +99,7 @@ docker compose up -d
 
 ### 3. Open de webinterface
 
-Ga naar `http://localhost:8000` (of het IP van je server), schakel een kanaal in onder
+Ga naar `http://localhost:8344` (of het IP van je server), schakel een kanaal in onder
 **Config** en voeg een zoekopdracht toe onder **Searches**.
 
 > **Updaten:** `docker compose pull && docker compose up -d`, of in Portainer
@@ -171,7 +171,7 @@ zet je basic-auth op het dashboard.
 
 ### RSS
 
-Zet RSS aan onder **Config → RSS** en abonneer je op `http://<host>:8000/feed.xml`.
+Zet RSS aan onder **Config → RSS** en abonneer je op `http://<host>:8344/feed.xml`.
 
 ### Proxies
 

@@ -4,7 +4,7 @@ services:
     pull_policy: always
     container_name: vinted-monitor
     ports:
-      - "8000:8000"
+      - "8344:8344"
     volumes:
       - vinted_data:/app/data
     restart: unless-stopped

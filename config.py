@@ -15,7 +15,7 @@ logger = get_logger(__name__)
 # Web UI network settings are process-level (not runtime editable), so they are read
 # straight from the environment here.
 WEB_HOST = os.environ.get("WEB_HOST", "0.0.0.0")
-WEB_PORT = int(os.environ.get("WEB_PORT", "8000"))
+WEB_PORT = int(os.environ.get("WEB_PORT", "8344"))
 WEB_USERNAME = os.environ.get("WEB_USERNAME", "")  # optional basic-auth
 WEB_PASSWORD = os.environ.get("WEB_PASSWORD", "")
 
