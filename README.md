@@ -1,5 +1,10 @@
 <div align="center">
-  <h1>🧥 Vinted Monitor</h1>
+  <img src="https://raw.githubusercontent.com/RichrdJ/vinted-scraper/main/docs/banner.svg" alt="Vinted Monitor" width="100%"/>
+</div>
+
+<br>
+
+<div align="center">
   <a href="https://github.com/RichrdJ/vinted-scraper/pkgs/container/vinted-scraper"><img src="https://img.shields.io/badge/ghcr.io-vinted--scraper-09b1ba?style=flat-square&logo=docker&logoColor=white" alt="Docker"/></a>
   <a href="https://github.com/RichrdJ/vinted-scraper/actions"><img src="https://img.shields.io/github/actions/workflow/status/RichrdJ/vinted-scraper/docker.yml?style=flat-square&label=build&color=09b1ba" alt="Build"/></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-AGPL--3.0-09b1ba?style=flat-square" alt="License"/></a>
@@ -37,23 +42,73 @@ je browser.
 
 ---
 
-## 🚀 Snel starten (Docker)
+## 📸 Screenshots
+
+<div align="center">
+  <img src="docs/screenshots/dashboard.png" alt="Dashboard" width="100%"/>
+  <br><sub><b>Dashboard</b>: statistieken, actieve kanalen en het laatst gevonden artikel</sub>
+</div>
+
+<br>
+
+<div align="center">
+  <img src="docs/screenshots/items.jpg" alt="Gevonden artikelen" width="100%"/>
+  <br><sub><b>Gevonden artikelen</b>: met foto, prijs, merk en maat</sub>
+</div>
+
+<br>
+
+<table>
+  <tr>
+    <td width="50%"><img src="docs/screenshots/searches.png" alt="Zoekopdrachten"/><br><sub><b>Zoekopdrachten</b>: plak een Vinted-URL en klaar</sub></td>
+    <td width="50%"><img src="docs/screenshots/config.png" alt="Instellingen"/><br><sub><b>Instellingen</b>: Telegram, ntfy, RSS, proxies en allowlist</sub></td>
+  </tr>
+</table>
+
+---
+
+## 🚀 Snel starten
+
+### Vereisten
+- Docker + Docker Compose (of Portainer)
+- Draait op `amd64` én `arm64` (Raspberry Pi, Synology, Apple Silicon)
+
+### 1. Maak een `docker-compose.yml` (of plak dit als stack in Portainer)
+
+```yaml
+services:
+  vinted-monitor:
+    image: ghcr.io/richrdj/vinted-scraper:latest
+    pull_policy: always
+    container_name: vinted-monitor
+    ports:
+      - "8000:8000"
+    volumes:
+      - vinted_data:/app/data
+    restart: unless-stopped
+    environment:
+      TZ: Europe/Amsterdam
+
+volumes:
+  vinted_data:
+```
+
+### 2. Start de container
 
 ```bash
-git clone https://github.com/RichrdJ/vinted-scraper.git
-cd vinted-scraper
-cp .env.example .env      # optioneel: vul Telegram / ntfy alvast in
 docker compose up -d
 ```
 
-Open **http://localhost:8000**, schakel een kanaal in onder **Config** en voeg een
-zoekopdracht toe onder **Searches**.
+### 3. Open de webinterface
 
-Of gebruik direct het kant-en-klare image:
+Ga naar `http://localhost:8000` (of het IP van je server), schakel een kanaal in onder
+**Config** en voeg een zoekopdracht toe onder **Searches**.
 
-```bash
-docker run -d --name vinted-scraper -p 8000:8000 -v ./data:/app/data ghcr.io/richrdj/vinted-scraper:latest
-```
+> **Updaten:** `docker compose pull && docker compose up -d`, of in Portainer
+> *Update the stack* met *Re-pull image*. Je data blijft bewaard in het volume
+> `vinted_data`.
+
+Liever zelf bouwen? `git clone` deze repo en draai `docker build -t vinted-scraper .`.
 
 ## 🐍 Lokaal draaien
 
@@ -95,7 +150,8 @@ nieuw.
 ## 🔧 Configuratie
 
 Alle instellingen staan in de database en zijn live aan te passen via **Config**.
-Variabelen in `.env` worden alleen bij de eerste start ingezaaid (zet `FORCE_` ervoor
+Omgevingsvariabelen (in de `environment:`-sectie van je stack, of in `.env` bij lokaal
+draaien, zie [`.env.example`](.env.example)) worden alleen bij de eerste start ingezaaid (zet `FORCE_` ervoor
 om ze bij elke start te overschrijven). `WEB_HOST`, `WEB_PORT`, `WEB_USERNAME` en
 `WEB_PASSWORD` komen altijd uit de omgeving. Met `WEB_USERNAME` en `WEB_PASSWORD`
 zet je basic-auth op het dashboard.

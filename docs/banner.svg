@@ -1,0 +1,106 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 280" width="1200" height="280">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1200" y2="280" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#05100f"/>
+      <stop offset="100%" stop-color="#08191a"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1200" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0%"   stop-color="#09b1ba"/>
+      <stop offset="50%"  stop-color="#5fe3ea"/>
+      <stop offset="100%" stop-color="#09b1ba"/>
+    </linearGradient>
+    <linearGradient id="iconGrad" x1="0" y1="0" x2="0" y2="1" gradientUnits="objectBoundingBox">
+      <stop offset="0%"   stop-color="#5fe3ea"/>
+      <stop offset="100%" stop-color="#09b1ba"/>
+    </linearGradient>
+    <filter id="softglow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="8" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="280" fill="url(#bg)"/>
+
+  <!-- Decorative glow circles -->
+  <circle cx="1100" cy="140" r="260" fill="#09b1ba" fill-opacity="0.06"/>
+  <circle cx="1200" cy="0"   r="140" fill="#5fe3ea" fill-opacity="0.05"/>
+  <circle cx="60"   cy="260" r="180" fill="#09b1ba" fill-opacity="0.04"/>
+  <circle cx="900"  cy="280" r="100" fill="#09b1ba" fill-opacity="0.03"/>
+
+  <!-- Subtle grid dots -->
+  <g fill="#09b1ba" fill-opacity="0.11">
+    <circle cx="820" cy="60"  r="2"/><circle cx="860" cy="60"  r="2"/><circle cx="900" cy="60"  r="2"/><circle cx="940" cy="60"  r="2"/><circle cx="980" cy="60"  r="2"/>
+    <circle cx="820" cy="100" r="2"/><circle cx="860" cy="100" r="2"/><circle cx="900" cy="100" r="2"/><circle cx="940" cy="100" r="2"/><circle cx="980" cy="100" r="2"/>
+    <circle cx="820" cy="140" r="2"/><circle cx="860" cy="140" r="2"/><circle cx="900" cy="140" r="2"/><circle cx="940" cy="140" r="2"/><circle cx="980" cy="140" r="2"/>
+    <circle cx="820" cy="180" r="2"/><circle cx="860" cy="180" r="2"/><circle cx="900" cy="180" r="2"/><circle cx="940" cy="180" r="2"/><circle cx="980" cy="180" r="2"/>
+    <circle cx="820" cy="220" r="2"/><circle cx="860" cy="220" r="2"/><circle cx="900" cy="220" r="2"/><circle cx="940" cy="220" r="2"/><circle cx="980" cy="220" r="2"/>
+  </g>
+
+  <!-- Mock notification cards (right side) -->
+  <rect x="1010" y="48"  width="168" height="58" rx="10" fill="#002a2c" fill-opacity="0.9"/>
+  <rect x="1010" y="48"  width="4"   height="58" rx="2"  fill="#09b1ba"/>
+  <rect x="1022" y="60"  width="60"  height="8"  rx="4"  fill="#09b1ba" fill-opacity="0.6"/>
+  <rect x="1022" y="74"  width="100" height="6"  rx="3"  fill="#ffffff"  fill-opacity="0.15"/>
+  <rect x="1022" y="86"  width="76"  height="6"  rx="3"  fill="#ffffff"  fill-opacity="0.1"/>
+  <text x="1158" y="66" font-family="sans-serif" font-size="11" fill="#5fe3ea" font-weight="600" text-anchor="end">€ 15,00</text>
+
+  <rect x="1010" y="118" width="168" height="58" rx="10" fill="#002a2c" fill-opacity="0.9"/>
+  <rect x="1010" y="118" width="4"   height="58" rx="2"  fill="#5fe3ea"/>
+  <rect x="1022" y="130" width="80"  height="8"  rx="4"  fill="#5fe3ea" fill-opacity="0.5"/>
+  <rect x="1022" y="144" width="110" height="6"  rx="3"  fill="#ffffff"  fill-opacity="0.15"/>
+  <rect x="1022" y="156" width="65"  height="6"  rx="3"  fill="#ffffff"  fill-opacity="0.1"/>
+  <text x="1158" y="136" font-family="sans-serif" font-size="11" fill="#5fe3ea" font-weight="600" text-anchor="end">€ 45,00</text>
+
+  <rect x="1010" y="188" width="168" height="58" rx="10" fill="#002a2c" fill-opacity="0.9"/>
+  <rect x="1010" y="188" width="4"   height="58" rx="2"  fill="#09b1ba"/>
+  <rect x="1022" y="200" width="55"  height="8"  rx="4"  fill="#09b1ba" fill-opacity="0.6"/>
+  <rect x="1022" y="214" width="95"  height="6"  rx="3"  fill="#ffffff"  fill-opacity="0.15"/>
+  <rect x="1022" y="226" width="70"  height="6"  rx="3"  fill="#ffffff"  fill-opacity="0.1"/>
+  <text x="1158" y="206" font-family="sans-serif" font-size="11" fill="#5fe3ea" font-weight="600" text-anchor="end">€ 8,50</text>
+
+  <!-- Top accent bar -->
+  <rect x="0" y="0" width="1200" height="4" fill="url(#accent)"/>
+
+  <!-- Bag-heart icon (Bootstrap bi-bag-heart, scaled ~7x, centred at 118,128) -->
+  <g transform="translate(118,128) scale(7) translate(-8,-8)" fill="url(#iconGrad)" filter="url(#softglow)">
+    <path fill-rule="evenodd" d="M10.5 3.5a2.5 2.5 0 0 0-5 0V4h5zm1 0V4H15v10a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V4h3.5v-.5a3.5 3.5 0 1 1 7 0M14 14V5H2v9a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1M8 7.993c1.664-1.711 5.825 1.283 0 5.132-5.825-3.85-1.664-6.843 0-5.132"/>
+  </g>
+
+  <!-- Notification dot on icon -->
+  <circle cx="160" cy="76" r="11" fill="#f38ba8"/>
+  <text x="160" y="81" font-family="sans-serif" font-size="12" font-weight="800" fill="white" text-anchor="middle">!</text>
+
+  <!-- App title -->
+  <text x="228" y="138"
+    font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+    font-size="60" font-weight="800" fill="white" letter-spacing="-2">
+    Vinted Monitor
+  </text>
+
+  <!-- Tagline -->
+  <text x="230" y="176"
+    font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+    font-size="21" fill="#4f9296" letter-spacing="0.2">
+    Nooit meer een koopje missen op Vinted
+  </text>
+
+  <!-- Pills -->
+  <rect x="230" y="205" width="96"  height="26" rx="13" fill="#09b1ba" fill-opacity="0.2" stroke="#09b1ba" stroke-opacity="0.4" stroke-width="1"/>
+  <text x="278" y="223" font-family="'Segoe UI',sans-serif" font-size="12" fill="#5fe3ea" text-anchor="middle" font-weight="600">Python 3.12</text>
+
+  <rect x="334" y="205" width="84"  height="26" rx="13" fill="#09b1ba" fill-opacity="0.2" stroke="#09b1ba" stroke-opacity="0.4" stroke-width="1"/>
+  <text x="376" y="223" font-family="'Segoe UI',sans-serif" font-size="12" fill="#5fe3ea" text-anchor="middle" font-weight="600">Telegram</text>
+
+  <rect x="426" y="205" width="60"  height="26" rx="13" fill="#09b1ba" fill-opacity="0.2" stroke="#09b1ba" stroke-opacity="0.4" stroke-width="1"/>
+  <text x="456" y="223" font-family="'Segoe UI',sans-serif" font-size="12" fill="#5fe3ea" text-anchor="middle" font-weight="600">ntfy</text>
+
+  <rect x="494" y="205" width="56"  height="26" rx="13" fill="#09b1ba" fill-opacity="0.2" stroke="#09b1ba" stroke-opacity="0.4" stroke-width="1"/>
+  <text x="522" y="223" font-family="'Segoe UI',sans-serif" font-size="12" fill="#5fe3ea" text-anchor="middle" font-weight="600">RSS</text>
+
+  <rect x="558" y="205" width="74"  height="26" rx="13" fill="#09b1ba" fill-opacity="0.2" stroke="#09b1ba" stroke-opacity="0.4" stroke-width="1"/>
+  <text x="595" y="223" font-family="'Segoe UI',sans-serif" font-size="12" fill="#5fe3ea" text-anchor="middle" font-weight="600">Docker</text>
+
+  <rect x="640" y="205" width="100" height="26" rx="13" fill="#09b1ba" fill-opacity="0.2" stroke="#09b1ba" stroke-opacity="0.4" stroke-width="1"/>
+  <text x="690" y="223" font-family="'Segoe UI',sans-serif" font-size="12" fill="#5fe3ea" text-anchor="middle" font-weight="600">Dark mode</text>
+</svg>

@@ -1,13 +1,24 @@
 services:
-  vinted-scraper:
-    build: .
-    # Or use a prebuilt image once published:
-    # image: ghcr.io/richrdj/vinted-scraper:latest
-    container_name: vinted-scraper
-    restart: unless-stopped
+  vinted-monitor:
+    image: ghcr.io/richrdj/vinted-scraper:latest
+    pull_policy: always
+    container_name: vinted-monitor
     ports:
-      - "8000:8000"        # web dashboard
+      - "8000:8000"
     volumes:
-      - ./data:/app/data   # SQLite DB + logs
-    env_file:
-      - .env
+      - vinted_data:/app/data
+    restart: unless-stopped
+    environment:
+      TZ: Europe/Amsterdam
+      # Optioneel — alles is ook in de webinterface in te stellen:
+      # WEB_USERNAME: admin
+      # WEB_PASSWORD: geheim
+      # TELEGRAM_ENABLED: "true"
+      # TELEGRAM_TOKEN: "123456:ABC..."
+      # TELEGRAM_CHAT_ID: "12345678"
+      # NTFY_ENABLED: "true"
+      # NTFY_TOPIC: "mijn-geheime-topic"
+      # QUERY_REFRESH_DELAY: "60"
+
+volumes:
+  vinted_data:
