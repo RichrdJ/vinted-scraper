@@ -1,0 +1,17 @@
+# Vinted Monitor — stack voor Portainer (of `docker compose -f docker-stack.yml up -d`)
+# Webinterface: http://<server>:8344
+services:
+  vinted-monitor:
+    image: ghcr.io/richrdj/vinted-scraper:latest
+    pull_policy: always
+    container_name: vinted-monitor
+    ports:
+      - "8344:8344"
+    volumes:
+      - vinted_data:/app/data
+    restart: unless-stopped
+    environment:
+      TZ: Europe/Amsterdam
+
+volumes:
+  vinted_data:

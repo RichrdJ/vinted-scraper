@@ -70,6 +70,8 @@ je browser.
 
 ### 1. Maak een `docker-compose.yml` (of plak dit als stack in Portainer)
 
+Deze stack staat ook kant-en-klaar in [`docker-stack.yml`](docker-stack.yml).
+
 ```yaml
 services:
   vinted-monitor:
