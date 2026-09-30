@@ -4,13 +4,41 @@
 <h1>Searches</h1>
 
 <section class="panel">
-  <h2>Add a search</h2>
-  <form method="post" class="form-row">
-    <input type="url" name="url" placeholder="https://www.vinted.nl/catalog?search_text=..." required>
-    <input type="text" name="name" placeholder="Optional name">
-    <button type="submit">Add</button>
+  <h2>New search</h2>
+  <form method="post" class="search-form">
+    <div class="form-grid">
+      <label class="span-2">Search term
+        <input type="text" name="keyword" placeholder="e.g. nike air max 90" required autofocus>
+      </label>
+      <label>Country
+        <select name="domain">
+          {% for domain, label in domains.items() %}
+          <option value="{{ domain }}">{{ label }} ({{ domain.replace('www.', '') }})</option>
+          {% endfor %}
+        </select>
+      </label>
+      <label>Min price
+        <input type="number" name="price_from" min="0" step="0.01" placeholder="€">
+      </label>
+      <label>Max price
+        <input type="number" name="price_to" min="0" step="0.01" placeholder="€">
+      </label>
+      <label>Name (optional)
+        <input type="text" name="name" placeholder="defaults to the search term">
+      </label>
+    </div>
+    <button type="submit">Add search</button>
   </form>
-  <p class="muted">Paste any Vinted catalog/search URL from your browser. It's normalized to newest-first automatically.</p>
+
+  <details class="advanced">
+    <summary>Or paste a Vinted URL (for brand, size, colour or condition filters)</summary>
+    <form method="post" class="form-row">
+      <input type="url" name="url" placeholder="https://www.vinted.nl/catalog?search_text=..." required>
+      <input type="text" name="name" placeholder="Optional name">
+      <button type="submit">Add</button>
+    </form>
+    <p class="muted">Set your filters on vinted.nl, then copy the URL from the address bar. It's normalized to newest-first automatically.</p>
+  </details>
 </section>
 
 <section class="panel">
@@ -22,7 +50,7 @@
       {% for q in queries %}
       <tr>
         <td>{{ loop.index }}</td>
-        <td>{{ q.name or "—" }}</td>
+        <td><a href="{{ url_for('items', query=q.id) }}">{{ q.name or "—" }}</a></td>
         <td class="url"><a href="{{ q.url }}" target="_blank" rel="noopener">{{ q.url }}</a></td>
         <td class="muted">{{ q.created_at | dt }}</td>
         <td>

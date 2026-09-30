@@ -2,7 +2,21 @@
 {% block title %}Items · vinted-scraper{% endblock %}
 {% block content %}
 <h1>Found items</h1>
+
+<form method="get" class="form-row filter-bar">
+  <input type="search" name="q" value="{{ q }}" placeholder="Search title, brand or size…">
+  <select name="query">
+    <option value="">All searches</option>
+    {% for s in queries %}
+    <option value="{{ s.id }}" {% if query_id == s.id %}selected{% endif %}>{{ s.name or s.url }}</option>
+    {% endfor %}
+  </select>
+  <button type="submit">Search</button>
+  {% if q or query_id %}<a href="{{ url_for('items') }}" class="muted">Reset</a>{% endif %}
+</form>
+
 {% if items %}
+<p class="muted">{{ items|length }} item{{ '' if items|length == 1 else 's' }}{% if q %} matching “{{ q }}”{% endif %}</p>
 <div class="grid">
   {% for it in items %}
   <a class="item" href="{{ it.item_url }}" target="_blank" rel="noopener">
@@ -19,6 +33,8 @@
   </a>
   {% endfor %}
 </div>
+{% elif q or query_id %}
+<p class="muted">No items match your search.</p>
 {% else %}
 <p class="muted">No items found yet.</p>
 {% endif %}

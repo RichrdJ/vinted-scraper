@@ -5,6 +5,7 @@
 <br>
 
 <div align="center">
+  <a href="https://github.com/RichrdJ/vinted-scraper/releases"><img src="https://img.shields.io/github/v/release/RichrdJ/vinted-scraper?color=09b1ba&label=release&style=flat-square" alt="Release"/></a>
   <a href="https://github.com/RichrdJ/vinted-scraper/pkgs/container/vinted-scraper"><img src="https://img.shields.io/badge/ghcr.io-vinted--scraper-09b1ba?style=flat-square&logo=docker&logoColor=white" alt="Docker"/></a>
   <a href="https://github.com/RichrdJ/vinted-scraper/actions"><img src="https://img.shields.io/github/actions/workflow/status/RichrdJ/vinted-scraper/docker.yml?style=flat-square&label=build&color=09b1ba" alt="Build"/></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-AGPL--3.0-09b1ba?style=flat-square" alt="License"/></a>
@@ -16,14 +17,18 @@ Nooit meer een koopje missen op Vinted. Stel zoekopdrachten in en ontvang direct
 melding zodra er een nieuw artikel verschijnt — via **Telegram**, **ntfy** of een
 **RSS-feed**, en beheer alles via de webinterface.
 
-Werkt op elk Vinted-domein (`.nl`, `.be`, `.de`, `.fr`, …): plak gewoon de zoek-URL uit
-je browser.
+Typ een zoekterm, kies een land en eventueel een prijsrange, en klaar. Voor extra filters
+(merk, maat, kleur, staat) plak je gewoon de zoek-URL uit je browser. Werkt op elk
+Vinted-domein (`.nl`, `.be`, `.de`, `.fr`, …).
 
 ---
 
 ## ✨ Functies
 
-- **Meerdere zoekopdrachten**: monitor zoveel Vinted-URL's als je wilt, elk met een eigen naam
+- **Zoeken op zoekterm**: zoekterm + land + min/max-prijs, of plak een Vinted-URL voor alle filters
+- **Meerdere zoekopdrachten**: monitor er zoveel als je wilt, elk met een eigen naam
+- **Veilig interval**: instelbaar in minuten, minimaal 5 zodat Vinted je IP niet blokkeert
+- **Zoeken in gevonden artikelen**: filter op titel, merk, maat of zoekopdracht
 - **Alleen nieuwe artikelen**: de eerste run legt het startpunt vast zonder meldingen, daarna krijg je alleen wat er nieuw bijkomt
 - **Telegram**: meldingen met foto, prijs, merk, maat en een "Open op Vinted"-knop, plus commando's om zoekopdrachten vanuit de chat te beheren
 - **ntfy**: pushmeldingen op je telefoon via [ntfy.sh](https://ntfy.sh) of een eigen server
@@ -55,7 +60,7 @@ je browser.
 
 <table>
   <tr>
-    <td width="50%"><img src="docs/screenshots/searches.png" alt="Zoekopdrachten"/><br><sub><b>Zoekopdrachten</b>: plak een Vinted-URL en klaar</sub></td>
+    <td width="50%"><img src="docs/screenshots/searches.png" alt="Zoekopdrachten"/><br><sub><b>Zoekopdrachten</b>: zoekterm, land en prijsrange, of plak een URL</sub></td>
     <td width="50%"><img src="docs/screenshots/config.png" alt="Instellingen"/><br><sub><b>Instellingen</b>: Telegram, ntfy, RSS, proxies en allowlist</sub></td>
   </tr>
 </table>
@@ -160,7 +165,7 @@ zet je basic-auth op het dashboard.
 3. Zet onder **Config → Telegram** het vinkje aan en vul token en chat-ID in.
 4. Herstart om de commandobot te activeren en stuur `/help` naar je bot.
 
-**Commando's:** `/add <url> [naam]`, `/queries`, `/remove <nr|all>`, `/allow <XX>`,
+**Commando's:** `/add <zoekterm>`, `/add <url> [naam]`, `/queries`, `/remove <nr|all>`, `/allow <XX>`,
 `/disallow <XX>`, `/allowlist`, `/status`.
 
 ### ntfy
@@ -197,7 +202,8 @@ URL met een proxylijst. Met *validate proxies* worden ze vooraf getest.
 
 ## ⚠️ Goed om te weten
 
-- Houd het interval redelijk (60 s of meer). Te vaak pollen kan leiden tot rate-limiting;
+- Het interval is minimaal **5 minuten**: Vinted blokkeert IP's die vaker pollen. Binnen een
+  ronde zit tussen elke zoekopdracht een korte willekeurige pauze. Word je toch geblokkeerd,
   verhoog dan het interval of gebruik proxies.
 - Vinted kan de paginastructuur op elk moment wijzigen. Geven zoekopdrachten ineens 0
   resultaten, kijk dan in **Logs**; de parser in `vinted/client.py` moet dan mogelijk

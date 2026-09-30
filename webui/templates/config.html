@@ -7,7 +7,8 @@
   <section class="panel">
     <h2>Scraping</h2>
     <label>Items per query <input type="number" name="items_per_query" value="{{ params.items_per_query }}" min="1" max="96"></label>
-    <label>Refresh delay (seconds) <input type="number" name="query_refresh_delay" value="{{ params.query_refresh_delay }}" min="10"></label>
+    <label>Refresh interval (minutes, minimum {{ min_refresh }}) <input type="number" name="refresh_minutes" value="{{ refresh_minutes }}" min="{{ min_refresh }}" step="1"></label>
+    <p class="muted hint">Vinted blocks IPs that poll too often, so the interval can't go below {{ min_refresh }} minutes. Every search is checked once per cycle, with a short pause between searches.</p>
     <label>Banwords (separate with <code>|||</code>) <input type="text" name="banwords" value="{{ params.banwords }}"></label>
   </section>
 

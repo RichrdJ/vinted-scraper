@@ -44,12 +44,12 @@ CREATE TABLE IF NOT EXISTS parameters (
 
 -- Default parameters. INSERT OR IGNORE keeps user-edited values on upgrade.
 INSERT OR IGNORE INTO parameters (key, value) VALUES
-    ('version',              '1.0.0'),
+    ('version',              '1.1.0'),
     ('github_url',           'https://github.com/RichrdJ/vinted-scraper'),
 
     -- Scraping
     ('items_per_query',      '20'),
-    ('query_refresh_delay',  '60'),   -- seconds between scrape cycles
+    ('refresh_minutes',      '5'),    -- minutes between scrape cycles (minimum 5)
     ('banwords',             ''),     -- '|||'-separated words that exclude a listing by title
 
     -- Telegram

@@ -5,7 +5,9 @@ Novelty is decided by item id (Vinted ids increase monotonically): a search's
 considered new. The very first scrape of a query only records that high-water mark, so
 you are not flooded with pre-existing listings.
 """
-from typing import List, Optional, Tuple
+import random
+import time
+from typing import Optional, Tuple
 from urllib.parse import parse_qs, urlencode, urlparse, urlunparse
 
 import db
@@ -18,6 +20,38 @@ from vinted.item import Item
 logger = get_logger(__name__)
 
 _STRIP_PARAMS = ("time", "search_id", "disabled_personalization", "page", "order")
+
+# Pause between individual searches within one cycle, to avoid request bursts.
+_QUERY_PAUSE_SECONDS = (3.0, 8.0)
+
+# Vinted domains selectable when creating a search from a keyword.
+DOMAINS = {
+    "www.vinted.nl": "Nederland",
+    "www.vinted.be": "België",
+    "www.vinted.de": "Duitsland",
+    "www.vinted.fr": "Frankrijk",
+    "www.vinted.es": "Spanje",
+    "www.vinted.it": "Italië",
+    "www.vinted.co.uk": "Verenigd Koninkrijk",
+}
+
+
+def build_search_url(
+    keyword: str,
+    domain: str = "www.vinted.nl",
+    price_from: Optional[str] = None,
+    price_to: Optional[str] = None,
+) -> str:
+    """Build a Vinted catalog URL from a keyword and optional price range."""
+    if domain not in DOMAINS:
+        domain = "www.vinted.nl"
+    params = {"search_text": keyword.strip()}
+    currency = "GBP" if domain.endswith(".co.uk") else "EUR"
+    for key, value in (("price_from", price_from), ("price_to", price_to)):
+        if value not in (None, ""):
+            params[key] = str(value).strip().replace(",", ".")
+            params["currency"] = currency
+    return f"https://{domain}/catalog?{urlencode(params)}"
 
 
 def normalize_query_url(url: str) -> str:
@@ -111,7 +145,9 @@ def scrape_once() -> int:
     banwords = db.get_parameter("banwords") or ""
 
     total_notified = 0
-    for query in queries:
+    for index, query in enumerate(queries):
+        if index:
+            time.sleep(random.uniform(*_QUERY_PAUSE_SECONDS))
         locale = urlparse(query["url"]).netloc or "www.vinted.nl"
         last_id = query["last_item"]
         first_scrape = last_id is None

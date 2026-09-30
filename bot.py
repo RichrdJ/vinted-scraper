@@ -15,7 +15,8 @@ logger = get_logger(__name__)
 
 HELP = (
     "🤖 *vinted-scraper*\n\n"
-    "/add <vinted-url> [name] — add a search\n"
+    "/add <search term> — add a search on vinted.nl\n"
+    "/add <vinted-url> [name] — add a search with filters\n"
     "/queries — list searches\n"
     "/remove <number|all> — remove a search\n"
     "/allow <XX> — add country to seller allowlist\n"
@@ -48,10 +49,15 @@ async def cmd_add(update, context):
     if not await _guard(update):
         return
     if not context.args:
-        await update.message.reply_text("Usage: /add <vinted-url> [name]")
+        await update.message.reply_text("Usage: /add <search term> or /add <vinted-url> [name]")
         return
-    url = context.args[0]
-    name = " ".join(context.args[1:]) or None
+    if context.args[0].startswith("http"):
+        url = context.args[0]
+        name = " ".join(context.args[1:]) or None
+    else:
+        keyword = " ".join(context.args)
+        url = scraper.build_search_url(keyword)
+        name = keyword
     message, _ = scraper.add_query(url, name)
     await update.message.reply_text(message)
 
@@ -130,7 +136,7 @@ async def cmd_status(update, context):
         f"Searches: {stats['total_queries']}\n"
         f"Items found: {stats['total_items']}\n"
         f"Items/day: {stats['items_per_day']}\n"
-        f"Refresh: every {db.get_int('query_refresh_delay', 60)}s"
+        f"Refresh: every {db.get_refresh_minutes()} min"
     )
 
 

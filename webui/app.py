@@ -26,7 +26,7 @@ app.secret_key = os.environ.get("FLASK_SECRET", os.urandom(24).hex())
 
 # Parameters editable from the config page.
 EDITABLE = [
-    "items_per_query", "query_refresh_delay", "banwords",
+    "items_per_query", "refresh_minutes", "banwords",
     "telegram_enabled", "telegram_token", "telegram_chat_id",
     "ntfy_enabled", "ntfy_server", "ntfy_topic", "ntfy_token", "ntfy_priority",
     "rss_enabled", "rss_max_items",
@@ -58,6 +58,11 @@ def requires_auth(fn):
     return wrapper
 
 
+@app.context_processor
+def _inject_globals():
+    return {"version": config.VERSION}
+
+
 @app.template_filter("dt")
 def _format_dt(ts):
     if not ts:
@@ -75,7 +80,7 @@ def index():
         "index.html",
         stats=db.get_stats(),
         notifiers=[n.name for n in notifiers.enabled_notifiers()],
-        refresh=db.get_int("query_refresh_delay", 60),
+        refresh=db.get_refresh_minutes(),
         rss_enabled=db.get_bool("rss_enabled"),
     )
 
@@ -83,15 +88,29 @@ def index():
 @app.route("/queries", methods=["GET", "POST"])
 @requires_auth
 def queries():
+    import scraper
+
     if request.method == "POST":
-        url = (request.form.get("url") or "").strip()
         name = (request.form.get("name") or "").strip() or None
+        keyword = (request.form.get("keyword") or "").strip()
+        url = (request.form.get("url") or "").strip()
+        if keyword:
+            url = scraper.build_search_url(
+                keyword,
+                domain=request.form.get("domain") or "www.vinted.nl",
+                price_from=request.form.get("price_from"),
+                price_to=request.form.get("price_to"),
+            )
+            name = name or keyword
         if url:
-            import scraper
             message, _ = scraper.add_query(url, name)
             flash(message)
+        else:
+            flash("Enter a search term or a Vinted URL.")
         return redirect(url_for("queries"))
-    return render_template("queries.html", queries=db.get_queries())
+    return render_template(
+        "queries.html", queries=db.get_queries(), domains=scraper.DOMAINS
+    )
 
 
 @app.route("/queries/<int:query_id>/delete", methods=["POST"])
@@ -105,7 +124,15 @@ def delete_query(query_id):
 @app.route("/items")
 @requires_auth
 def items():
-    return render_template("items.html", items=db.get_items(limit=120))
+    q = (request.args.get("q") or "").strip()
+    query_id = request.args.get("query", type=int)
+    return render_template(
+        "items.html",
+        items=db.get_items(limit=240, query_id=query_id, search=q or None),
+        q=q,
+        query_id=query_id,
+        queries=db.get_queries(),
+    )
 
 
 @app.route("/config", methods=["GET", "POST"])
@@ -117,12 +144,29 @@ def config_page():
                 db.set_parameter(key, "True" if request.form.get(key) else "False")
             elif key in request.form:
                 db.set_parameter(key, request.form.get(key).strip())
+
+        # Enforce the minimum interval: polling faster gets you banned by Vinted.
+        try:
+            minutes = int(request.form.get("refresh_minutes", db.MIN_REFRESH_MINUTES))
+        except ValueError:
+            minutes = db.MIN_REFRESH_MINUTES
+        if minutes < db.MIN_REFRESH_MINUTES:
+            flash(f"Refresh interval raised to the minimum of {db.MIN_REFRESH_MINUTES} minutes.")
+            minutes = db.MIN_REFRESH_MINUTES
+        db.set_parameter("refresh_minutes", str(minutes))
+
         proxies.invalidate_cache()
-        flash("Configuration saved. Refresh-delay changes apply on the next cycle.")
+        flash("Configuration saved.")
         return redirect(url_for("config_page"))
 
     params = db.get_all_parameters()
-    return render_template("config.html", params=params, allowlist=db.get_allowlist())
+    return render_template(
+        "config.html",
+        params=params,
+        allowlist=db.get_allowlist(),
+        refresh_minutes=db.get_refresh_minutes(),
+        min_refresh=db.MIN_REFRESH_MINUTES,
+    )
 
 
 @app.route("/allowlist", methods=["POST"])

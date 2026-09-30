@@ -12,6 +12,8 @@ from logger import get_logger
 
 logger = get_logger(__name__)
 
+VERSION = "1.1.0"
+
 # Web UI network settings are process-level (not runtime editable), so they are read
 # straight from the environment here.
 WEB_HOST = os.environ.get("WEB_HOST", "0.0.0.0")
@@ -32,7 +34,7 @@ _ENV_TO_PARAM = {
     "RSS_ENABLED": "rss_enabled",
     "RSS_MAX_ITEMS": "rss_max_items",
     "ITEMS_PER_QUERY": "items_per_query",
-    "QUERY_REFRESH_DELAY": "query_refresh_delay",
+    "REFRESH_MINUTES": "refresh_minutes",
     "BANWORDS": "banwords",
     "PROXY_LIST": "proxy_list",
     "PROXY_LIST_LINK": "proxy_list_link",
@@ -58,8 +60,13 @@ def _load_dotenv() -> None:
 
 
 def seed_from_env() -> None:
-    """Seed parameters from the environment. Call once, after ``db.init_db()``."""
+    """Seed parameters from the environment. Call once, after ``db.init_db()``.
+
+    Plain variables are applied once per database (tracked by ``env_seeded``) so that
+    later edits in the web UI survive restarts; ``FORCE_`` variables apply every boot.
+    """
     _load_dotenv()
+    first_seed = not db.get_bool("env_seeded")
     for env_key, param_key in _ENV_TO_PARAM.items():
         forced = os.environ.get("FORCE_" + env_key)
         if forced is not None:
@@ -68,9 +75,7 @@ def seed_from_env() -> None:
             continue
 
         value = os.environ.get(env_key)
-        if value is None:
-            continue
-        current = (db.get_parameter(param_key) or "").strip()
-        if current == "":
+        if value is not None and first_seed:
             db.set_parameter(param_key, value)
             logger.info("Parameter %s seeded from environment", param_key)
+    db.set_parameter("env_seeded", "True")

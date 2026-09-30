@@ -70,6 +70,14 @@ def get_int(key: str, default: int = 0) -> int:
         return default
 
 
+MIN_REFRESH_MINUTES = 5  # polling faster gets IPs banned by Vinted
+
+
+def get_refresh_minutes() -> int:
+    """Refresh interval in minutes, never below MIN_REFRESH_MINUTES."""
+    return max(MIN_REFRESH_MINUTES, get_int("refresh_minutes", MIN_REFRESH_MINUTES))
+
+
 def get_bool(key: str) -> bool:
     return (get_parameter(key) or "").strip().lower() in ("true", "1", "yes", "on")
 
@@ -195,15 +203,24 @@ def add_item(
         )
 
 
-def get_items(limit: int = 100, query_id: Optional[int] = None) -> List[sqlite3.Row]:
+def get_items(
+    limit: int = 100, query_id: Optional[int] = None, search: Optional[str] = None
+) -> List[sqlite3.Row]:
     sql = (
         "SELECT i.*, q.name AS query_name, q.url AS query_url "
         "FROM items i LEFT JOIN queries q ON i.query_id = q.id "
     )
+    where: List[str] = []
     params: Tuple = ()
     if query_id is not None:
-        sql += "WHERE i.query_id=? "
-        params = (query_id,)
+        where.append("i.query_id=?")
+        params += (query_id,)
+    if search:
+        like = f"%{search}%"
+        where.append("(i.title LIKE ? OR i.brand LIKE ? OR i.size LIKE ?)")
+        params += (like, like, like)
+    if where:
+        sql += "WHERE " + " AND ".join(where) + " "
     sql += "ORDER BY i.found_at DESC, i.timestamp DESC LIMIT ?"
     params = params + (limit,)
     with _connect() as conn:
