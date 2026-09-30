@@ -17,16 +17,16 @@ Nooit meer een koopje missen op Vinted. Stel zoekopdrachten in en ontvang direct
 melding zodra er een nieuw artikel verschijnt — via **Telegram**, **ntfy** of een
 **RSS-feed**, en beheer alles via de webinterface.
 
-Typ een zoekterm, kies een land en eventueel een prijsrange, en klaar. Voor extra filters
-(merk, maat, kleur, staat) plak je gewoon de zoek-URL uit je browser. Werkt op elk
-Vinted-domein (`.nl`, `.be`, `.de`, `.fr`, …).
+Zoek op Vinted zoals je gewend bent, stel je filters in (merk, maat, prijs, staat) en plak
+de URL uit je adresbalk. Werkt op elk Vinted-domein (`.nl`, `.be`, `.de`, `.fr`, …).
 
 ---
 
 ## ✨ Functies
 
-- **Zoeken op zoekterm**: zoekterm + land + min/max-prijs, of plak een Vinted-URL voor alle filters
-- **Meerdere zoekopdrachten**: monitor er zoveel als je wilt, elk met een eigen naam
+- **Zoekopdracht = Vinted-URL**: plak de zoek-URL met al je filters; een simpele zoekterm met land en prijsrange kan ook
+- **Meerdere zoekopdrachten**: monitor er zoveel als je wilt, elk met een eigen naam, en pas ze later aan
+- **Handmatig scannen**: check één of alle zoekopdrachten direct, en zie per zoekopdracht wanneer die voor het laatst is gescand en met welk resultaat
 - **Veilig interval**: instelbaar in minuten, minimaal 5 zodat Vinted je IP niet blokkeert
 - **Zoeken in gevonden artikelen**: filter op titel, merk, maat of zoekopdracht
 - **Alleen nieuwe artikelen**: de eerste run legt het startpunt vast zonder meldingen, daarna krijg je alleen wat er nieuw bijkomt
@@ -60,7 +60,7 @@ Vinted-domein (`.nl`, `.be`, `.de`, `.fr`, …).
 
 <table>
   <tr>
-    <td width="50%"><img src="docs/screenshots/searches.png" alt="Zoekopdrachten"/><br><sub><b>Zoekopdrachten</b>: zoekterm, land en prijsrange, of plak een URL</sub></td>
+    <td width="50%"><img src="docs/screenshots/searches.png" alt="Zoekopdrachten"/><br><sub><b>Zoekopdrachten</b>: plak een URL, bewerk of scan handmatig</sub></td>
     <td width="50%"><img src="docs/screenshots/config.png" alt="Instellingen"/><br><sub><b>Instellingen</b>: Telegram, ntfy, RSS, proxies en allowlist</sub></td>
   </tr>
 </table>
@@ -165,7 +165,7 @@ zet je basic-auth op het dashboard.
 3. Zet onder **Config → Telegram** het vinkje aan en vul token en chat-ID in.
 4. Herstart om de commandobot te activeren en stuur `/help` naar je bot.
 
-**Commando's:** `/add <zoekterm>`, `/add <url> [naam]`, `/queries`, `/remove <nr|all>`, `/allow <XX>`,
+**Commando's:** `/add <url> [naam]`, `/add <zoekterm>`, `/queries`, `/scan <nr|all>`, `/remove <nr|all>`, `/allow <XX>`,
 `/disallow <XX>`, `/allowlist`, `/status`.
 
 ### ntfy
@@ -203,7 +203,8 @@ URL met een proxylijst. Met *validate proxies* worden ze vooraf getest.
 ## ⚠️ Goed om te weten
 
 - Het interval is minimaal **5 minuten**: Vinted blokkeert IP's die vaker pollen. Binnen een
-  ronde zit tussen elke zoekopdracht een korte willekeurige pauze. Word je toch geblokkeerd,
+  ronde zit tussen elke zoekopdracht een korte willekeurige pauze, en handmatig scannen kan
+  maximaal één keer per minuut per zoekopdracht. Word je toch geblokkeerd,
   verhoog dan het interval of gebruik proxies.
 - Vinted kan de paginastructuur op elk moment wijzigen. Geven zoekopdrachten ineens 0
   resultaten, kijk dan in **Logs**; de parser in `vinted/client.py` moet dan mogelijk

@@ -28,6 +28,10 @@ _LANG = {
 }
 
 
+class VintedFetchError(Exception):
+    """The catalog page could not be fetched or parsed (e.g. blocked, rate-limited)."""
+
+
 def _decode_payload(html: str) -> str:
     chunks = _RSC_CHUNK.findall(html)
     if not chunks:
@@ -62,19 +66,23 @@ def _balanced_object(text: str, brace_start: int) -> Optional[str]:
 
 class VintedClient:
     def search(self, url: str, per_page: int = 20) -> List[Item]:
-        """Return up to ``per_page`` listings for a Vinted catalog ``url``."""
+        """Return up to ``per_page`` listings for a Vinted catalog ``url``.
+
+        Raises :class:`VintedFetchError` when the page can't be fetched or parsed,
+        so callers can tell a block apart from a search with no results.
+        """
         locale = urlparse(url).netloc or "www.vinted.nl"
         resp = requester.get(url, accept_language=_LANG.get(locale, "en-US,en;q=0.9"))
 
         if resp is None or resp.status_code != 200:
             status = resp.status_code if resp is not None else "no response"
             logger.error("Catalog fetch failed for %s (status: %s)", url, status)
-            return []
+            raise VintedFetchError(f"HTTP {status}")
 
         payload = _decode_payload(resp.text)
         if not payload:
             logger.error("No RSC data found in catalog page for %s", url)
-            return []
+            raise VintedFetchError("page structure not recognised")
 
         items: List[Item] = []
         seen = set()

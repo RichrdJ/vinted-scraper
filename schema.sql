@@ -8,8 +8,10 @@ CREATE TABLE IF NOT EXISTS queries (
     id         INTEGER PRIMARY KEY AUTOINCREMENT,
     url        TEXT NOT NULL UNIQUE,        -- normalized Vinted catalog URL
     name       TEXT,                        -- optional friendly label
-    last_item  INTEGER,                     -- highest item timestamp seen for this query
-    created_at INTEGER DEFAULT (strftime('%s', 'now'))
+    last_item  INTEGER,                     -- highest item id seen for this query
+    created_at INTEGER DEFAULT (strftime('%s', 'now')),
+    last_scan_at     INTEGER,               -- unix time of the last scan
+    last_scan_result TEXT                   -- human-readable outcome of the last scan
 );
 
 -- Items we have already seen/notified about (deduplication + history for RSS/UI).
@@ -44,7 +46,7 @@ CREATE TABLE IF NOT EXISTS parameters (
 
 -- Default parameters. INSERT OR IGNORE keeps user-edited values on upgrade.
 INSERT OR IGNORE INTO parameters (key, value) VALUES
-    ('version',              '1.1.0'),
+    ('version',              '1.2.0'),
     ('github_url',           'https://github.com/RichrdJ/vinted-scraper'),
 
     -- Scraping

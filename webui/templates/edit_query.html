@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Edit search · vinted-scraper{% endblock %}
+{% block content %}
+<h1>Edit search</h1>
+
+<section class="panel">
+  <form method="post">
+    <label>Name
+      <input type="text" name="name" value="{{ query.name or '' }}" placeholder="Optional name">
+    </label>
+    <label>Vinted URL
+      <input type="url" name="url" value="{{ query.url }}" required>
+    </label>
+    <p class="muted hint">Tip: <a href="{{ query.url }}" target="_blank" rel="noopener">open this search on Vinted</a>, adjust the filters there and paste the new URL here. Changing the URL restarts the search: listings that already exist won't be notified.</p>
+    <div class="form-row">
+      <button type="submit">Save</button>
+      <a href="{{ url_for('queries') }}" class="muted">Cancel</a>
+    </div>
+  </form>
+</section>
+
+<section class="panel">
+  <h2>Status</h2>
+  <p>Last scan: {{ query.last_scan_at | ago }}{% if query.last_scan_result %}: {{ query.last_scan_result }}{% endif %}</p>
+  <p>Added: {{ query.created_at | dt }} · <a href="{{ url_for('items', query=query.id) }}">Items found by this search</a></p>
+</section>
+{% endblock %}

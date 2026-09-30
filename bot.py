@@ -19,6 +19,7 @@ HELP = (
     "/add <vinted-url> [name] — add a search with filters\n"
     "/queries — list searches\n"
     "/remove <number|all> — remove a search\n"
+    "/scan <number|all> — check a search right now\n"
     "/allow <XX> — add country to seller allowlist\n"
     "/disallow <XX> — remove country from allowlist\n"
     "/allowlist — show allowlist\n"
@@ -99,6 +100,24 @@ async def cmd_remove(update, context):
         await update.message.reply_text("No search with that number.")
 
 
+async def cmd_scan(update, context):
+    if not await _guard(update):
+        return
+    rows = db.get_queries()
+    arg = context.args[0].lower() if context.args else ""
+    loop = asyncio.get_running_loop()
+    if arg in ("", "all"):
+        _, message = scraper.scan_all_async()
+        await update.message.reply_text(message.replace(" Refresh this page in a minute.", ""))
+        return
+    if not arg.isdigit() or not 0 < int(arg) <= len(rows):
+        await update.message.reply_text("Usage: /scan <number> or /scan all (see /queries)")
+        return
+    # Run the blocking scan off the bot's event loop.
+    _, message = await loop.run_in_executor(None, scraper.scan_now, rows[int(arg) - 1]["id"])
+    await update.message.reply_text(message)
+
+
 async def cmd_allow(update, context):
     if not await _guard(update):
         return
@@ -148,6 +167,7 @@ def build_application(token: str):
     app.add_handler(CommandHandler("add", cmd_add))
     app.add_handler(CommandHandler("queries", cmd_queries))
     app.add_handler(CommandHandler("remove", cmd_remove))
+    app.add_handler(CommandHandler("scan", cmd_scan))
     app.add_handler(CommandHandler("allow", cmd_allow))
     app.add_handler(CommandHandler("disallow", cmd_disallow))
     app.add_handler(CommandHandler("allowlist", cmd_allowlist))

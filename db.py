@@ -45,7 +45,23 @@ def init_db() -> None:
         script = fh.read()
     with _connect() as conn:
         conn.executescript(script)
+        _migrate(conn)
     logger.info("Database ready at %s", DB_PATH)
+
+
+# Columns added after the first release: (table, column, type).
+_ADDED_COLUMNS = [
+    ("queries", "last_scan_at", "INTEGER"),
+    ("queries", "last_scan_result", "TEXT"),
+]
+
+
+def _migrate(conn) -> None:
+    for table, column, col_type in _ADDED_COLUMNS:
+        existing = {r["name"] for r in conn.execute(f"PRAGMA table_info({table})")}
+        if column not in existing:
+            conn.execute(f"ALTER TABLE {table} ADD COLUMN {column} {col_type}")
+            logger.info("Migrated: added %s.%s", table, column)
 
 
 # --------------------------------------------------------------------------- #
@@ -119,25 +135,48 @@ def query_exists(url: str) -> bool:
     return row is not None
 
 
+_QUERY_COLUMNS = "id, url, name, last_item, created_at, last_scan_at, last_scan_result"
+
+
 def get_queries() -> List[sqlite3.Row]:
     with _connect() as conn:
         return conn.execute(
-            "SELECT id, url, name, last_item, created_at FROM queries ORDER BY id"
+            f"SELECT {_QUERY_COLUMNS} FROM queries ORDER BY id"
         ).fetchall()
 
 
 def get_query(query_id: int) -> Optional[sqlite3.Row]:
     with _connect() as conn:
         return conn.execute(
-            "SELECT id, url, name, last_item, created_at FROM queries WHERE id=?",
-            (query_id,),
+            f"SELECT {_QUERY_COLUMNS} FROM queries WHERE id=?", (query_id,)
         ).fetchone()
 
 
-def update_query(query_id: int, url: str, name: Optional[str]) -> None:
+def update_query(
+    query_id: int, url: str, name: Optional[str], reset_progress: bool = False
+) -> bool:
+    """Update a query. Returns False if another query already uses ``url``.
+
+    With ``reset_progress`` the high-water mark is cleared, so the next scan
+    re-seeds silently instead of notifying about everything under the new URL.
+    """
+    sql = "UPDATE queries SET url=?, name=?"
+    if reset_progress:
+        sql += ", last_item=NULL, last_scan_at=NULL, last_scan_result=NULL"
+    sql += " WHERE id=?"
+    try:
+        with _connect() as conn:
+            conn.execute(sql, (url, name, query_id))
+        return True
+    except sqlite3.IntegrityError:
+        return False
+
+
+def set_scan_result(query_id: int, result: str) -> None:
     with _connect() as conn:
         conn.execute(
-            "UPDATE queries SET url=?, name=? WHERE id=?", (url, name, query_id)
+            "UPDATE queries SET last_scan_at=?, last_scan_result=? WHERE id=?",
+            (int(time.time()), result, query_id),
         )
 
 

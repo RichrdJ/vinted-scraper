@@ -5,6 +5,7 @@ logs, plus an RSS feed at ``/feed.xml``. Optional HTTP basic auth is enabled by
 setting ``WEB_USERNAME`` / ``WEB_PASSWORD``.
 """
 import os
+import time
 from datetime import datetime, timezone
 from functools import wraps
 
@@ -63,6 +64,20 @@ def _inject_globals():
     return {"version": config.VERSION}
 
 
+@app.template_filter("ago")
+def _format_ago(ts):
+    if not ts:
+        return "never"
+    seconds = max(0, int(time.time()) - int(ts))
+    if seconds < 60:
+        return "just now"
+    if seconds < 3600:
+        return f"{seconds // 60} min ago"
+    if seconds < 86400:
+        return f"{seconds // 3600} h ago"
+    return f"{seconds // 86400} d ago"
+
+
 @app.template_filter("dt")
 def _format_dt(ts):
     if not ts:
@@ -109,7 +124,10 @@ def queries():
             flash("Enter a search term or a Vinted URL.")
         return redirect(url_for("queries"))
     return render_template(
-        "queries.html", queries=db.get_queries(), domains=scraper.DOMAINS
+        "queries.html",
+        queries=db.get_queries(),
+        domains=scraper.DOMAINS,
+        scanning=scraper.is_scanning(),
     )
 
 
@@ -118,6 +136,45 @@ def queries():
 def delete_query(query_id):
     db.remove_query(query_id)
     flash("Search removed.")
+    return redirect(url_for("queries"))
+
+
+@app.route("/queries/<int:query_id>/edit", methods=["GET", "POST"])
+@requires_auth
+def edit_query(query_id):
+    import scraper
+
+    query = db.get_query(query_id)
+    if query is None:
+        abort(404)
+    if request.method == "POST":
+        url = (request.form.get("url") or "").strip()
+        name = (request.form.get("name") or "").strip() or None
+        message, ok = scraper.update_search(query_id, url, name)
+        flash(message)
+        if ok:
+            return redirect(url_for("queries"))
+        return redirect(url_for("edit_query", query_id=query_id))
+    return render_template("edit_query.html", query=query)
+
+
+@app.route("/queries/<int:query_id>/scan", methods=["POST"])
+@requires_auth
+def scan_query(query_id):
+    import scraper
+
+    _, message = scraper.scan_now(query_id)
+    flash(message)
+    return redirect(url_for("queries"))
+
+
+@app.route("/queries/scan-all", methods=["POST"])
+@requires_auth
+def scan_all():
+    import scraper
+
+    _, message = scraper.scan_all_async()
+    flash(message)
     return redirect(url_for("queries"))
 
 

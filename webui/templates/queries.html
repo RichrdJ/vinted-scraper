@@ -5,63 +5,84 @@
 
 <section class="panel">
   <h2>New search</h2>
-  <form method="post" class="search-form">
-    <div class="form-grid">
-      <label class="span-2">Search term
-        <input type="text" name="keyword" placeholder="e.g. nike air max 90" required autofocus>
-      </label>
-      <label>Country
-        <select name="domain">
-          {% for domain, label in domains.items() %}
-          <option value="{{ domain }}">{{ label }} ({{ domain.replace('www.', '') }})</option>
-          {% endfor %}
-        </select>
-      </label>
-      <label>Min price
-        <input type="number" name="price_from" min="0" step="0.01" placeholder="€">
-      </label>
-      <label>Max price
-        <input type="number" name="price_to" min="0" step="0.01" placeholder="€">
-      </label>
-      <label>Name (optional)
-        <input type="text" name="name" placeholder="defaults to the search term">
-      </label>
-    </div>
+  <p class="muted">Search on <a href="https://www.vinted.nl" target="_blank" rel="noopener">vinted.nl</a> and set your filters (brand, size, price, condition…), then copy the URL from the address bar. It's normalized to newest-first automatically.</p>
+  <form method="post" class="form-row">
+    <input type="url" name="url" placeholder="https://www.vinted.nl/catalog?search_text=..." required autofocus>
+    <input type="text" name="name" placeholder="Name (optional)">
     <button type="submit">Add search</button>
   </form>
 
   <details class="advanced">
-    <summary>Or paste a Vinted URL (for brand, size, colour or condition filters)</summary>
-    <form method="post" class="form-row">
-      <input type="url" name="url" placeholder="https://www.vinted.nl/catalog?search_text=..." required>
-      <input type="text" name="name" placeholder="Optional name">
-      <button type="submit">Add</button>
+    <summary>Or build a simple search from a search term</summary>
+    <form method="post">
+      <div class="form-grid">
+        <label class="span-2">Search term
+          <input type="text" name="keyword" placeholder="e.g. nike air max 90" required>
+        </label>
+        <label>Country
+          <select name="domain">
+            {% for domain, label in domains.items() %}
+            <option value="{{ domain }}">{{ label }} ({{ domain.replace('www.', '') }})</option>
+            {% endfor %}
+          </select>
+        </label>
+        <label>Min price
+          <input type="number" name="price_from" min="0" step="0.01" placeholder="€">
+        </label>
+        <label>Max price
+          <input type="number" name="price_to" min="0" step="0.01" placeholder="€">
+        </label>
+        <label>Name (optional)
+          <input type="text" name="name" placeholder="defaults to the search term">
+        </label>
+      </div>
+      <button type="submit">Add search</button>
     </form>
-    <p class="muted">Set your filters on vinted.nl, then copy the URL from the address bar. It's normalized to newest-first automatically.</p>
   </details>
 </section>
 
 <section class="panel">
-  <h2>Monitored searches ({{ queries|length }})</h2>
+  <div class="panel-head">
+    <h2>Monitored searches ({{ queries|length }})</h2>
+    {% if queries %}
+    <form method="post" action="{{ url_for('scan_all') }}">
+      <button type="submit" class="secondary" {% if scanning %}disabled{% endif %}>
+        {% if scanning %}Scanning…{% else %}↻ Scan all now{% endif %}
+      </button>
+    </form>
+    {% endif %}
+  </div>
   {% if queries %}
   <table>
-    <thead><tr><th>#</th><th>Name</th><th>URL</th><th>Added</th><th></th></tr></thead>
+    <thead><tr><th>#</th><th>Name</th><th>URL</th><th>Last scan</th><th></th></tr></thead>
     <tbody>
       {% for q in queries %}
       <tr>
         <td>{{ loop.index }}</td>
-        <td><a href="{{ url_for('items', query=q.id) }}">{{ q.name or "—" }}</a></td>
-        <td class="url"><a href="{{ q.url }}" target="_blank" rel="noopener">{{ q.url }}</a></td>
-        <td class="muted">{{ q.created_at | dt }}</td>
+        <td><a href="{{ url_for('items', query=q.id) }}" title="Show items found by this search">{{ q.name or "—" }}</a></td>
+        <td class="url"><a href="{{ q.url }}" target="_blank" rel="noopener" title="{{ q.url }}">{{ q.url }}</a></td>
+        <td class="scan-cell">
+          <span title="{{ q.last_scan_at | dt }}">{{ q.last_scan_at | ago }}</span>
+          {% if q.last_scan_result %}
+          <div class="scan-result {% if q.last_scan_result.startswith('Failed') %}bad{% elif q.last_scan_result.startswith('0 ') or q.last_scan_result.startswith('No ') %}muted{% else %}good{% endif %}">{{ q.last_scan_result }}</div>
+          {% endif %}
+        </td>
         <td>
-          <form method="post" action="{{ url_for('delete_query', query_id=q.id) }}" onsubmit="return confirm('Remove this search?');">
-            <button class="danger" type="submit">Remove</button>
+          <div class="actions-cell">
+          <form method="post" action="{{ url_for('scan_query', query_id=q.id) }}">
+            <button type="submit" class="secondary small" title="Check this search now" {% if scanning %}disabled{% endif %}>↻ Scan</button>
           </form>
+          <a class="button secondary small" href="{{ url_for('edit_query', query_id=q.id) }}">Edit</a>
+          <form method="post" action="{{ url_for('delete_query', query_id=q.id) }}" onsubmit="return confirm('Remove this search and its found items?');">
+            <button class="danger small" type="submit">Remove</button>
+          </form>
+          </div>
         </td>
       </tr>
       {% endfor %}
     </tbody>
   </table>
+  <p class="muted hint-below">Manual scans are limited to once per minute per search, to avoid getting blocked by Vinted.</p>
   {% else %}
   <p class="muted">No searches yet.</p>
   {% endif %}

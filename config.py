@@ -12,7 +12,7 @@ from logger import get_logger
 
 logger = get_logger(__name__)
 
-VERSION = "1.1.0"
+VERSION = "1.2.0"
 
 # Web UI network settings are process-level (not runtime editable), so they are read
 # straight from the environment here.
