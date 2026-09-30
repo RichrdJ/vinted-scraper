@@ -19,8 +19,6 @@ melding zodra er een nieuw artikel verschijnt — via **Telegram**, **ntfy** of 
 Werkt op elk Vinted-domein (`.nl`, `.be`, `.de`, `.fr`, …): plak gewoon de zoek-URL uit
 je browser.
 
-> Gebaseerd op en geïnspireerd door
-> [Fuyucch1/Vinted-Notifications](https://github.com/Fuyucch1/Vinted-Notifications)
 > (AGPL-3.0), herschreven met een eenvoudiger single-process ontwerp, een nieuwe
 > webinterface en ntfy-ondersteuning.
 
